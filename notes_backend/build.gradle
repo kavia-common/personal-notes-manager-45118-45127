@@ -28,6 +28,32 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+springBoot {
+	// Explicitly set the main class to avoid bootJar failing to resolve it automatically
+	mainClass = 'com.example.notesbackend.NotesbackendApplication'
+}
+
+tasks.withType(Test).configureEach {
+	// Ensure JUnit Platform is used and keep logs informative
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+		exceptionFormat "short"
+		showStandardStreams = false
+	}
+
+	// Avoid long hanging tests in CI: no parallel forks unless configured
+	// and a sensible default timeout for individual tests
+	systemProperty "junit.jupiter.execution.timeout.default", "10s"
+
+	// Don't fail fast so we can see all failures in CI
+	failFast = false
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }

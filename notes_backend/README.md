@@ -11,6 +11,23 @@ Spring Boot REST API for a personal notes manager.
 - Swagger UI at /swagger-ui.html
 - H2 console at /h2-console
 
+## Build
+
+Standard build:
+```
+./gradlew clean build
+```
+
+If CI needs a faster preview without integration-like tests, use:
+```
+./gradlew clean test -PquickUnit
+```
+
+Where `-PquickUnit` is interpreted by CI to only select fast tests. Currently all tests are fairly light, but if build timeouts occur, consider limiting to specific packages or tags via:
+```
+./gradlew test --tests '*NoteServiceTest'
+```
+
 ## Run
 
 ```
