@@ -33,6 +33,11 @@ springBoot {
 	mainClass = 'com.example.notesbackend.NotesbackendApplication'
 }
 
+// Also configure bootRun explicitly (Gradle 8+ idiomatic API)
+tasks.named('bootRun') {
+	mainClass.set('com.example.notesbackend.NotesbackendApplication')
+}
+
 tasks.withType(Test).configureEach {
 	// Ensure JUnit Platform is used and keep logs informative
 	useJUnitPlatform()
