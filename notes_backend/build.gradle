@@ -43,10 +43,12 @@ springBoot {
 }
 
 /**
- * Ensure bootRun also uses the same main class explicitly.
- * This prevents Gradle from attempting classpath scanning to resolve it.
+ * Ensure bootRun and bootJar also use the same main class explicitly.
  */
 tasks.named('bootRun') {
+    mainClass.set('com.example.notesbackend.NotesbackendApplication')
+}
+tasks.named('bootJar') {
     mainClass.set('com.example.notesbackend.NotesbackendApplication')
 }
 
@@ -57,13 +59,36 @@ tasks.withType(Test).configureEach {
         exceptionFormat "short"
         showStandardStreams = false
     }
-
     systemProperty "junit.jupiter.execution.timeout.default", "10s"
     failFast = false
 }
 
+/**
+ * Default test task; can be heavy. Provide a quickTest for CI previews to avoid timeouts.
+ */
+tasks.register('quickTest', Test) {
+    useJUnitPlatform()
+    description = "Runs a minimal set of unit tests for fast verification"
+    group = "verification"
+    // Run only fast tests by package/class patterns
+    include '**/ContextLoadTest.class'
+    include '**/service/*Test.class'
+    testLogging {
+        events "failed"
+        exceptionFormat "short"
+        showStandardStreams = false
+    }
+}
+
+/**
+ * Allow -PquickUnit to filter tests when invoking `test`
+ */
 tasks.named('test') {
     useJUnitPlatform()
+    if (project.hasProperty('quickUnit')) {
+        // Skip slower web-layer tests in quick mode
+        exclude '**/web/*'
+    }
 }
 
 /*
