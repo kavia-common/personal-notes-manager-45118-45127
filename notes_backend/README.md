@@ -39,12 +39,21 @@ Recommended for preview (no tests and no devtools/live-reload blocking):
 ./gradlew runFast
 ```
 
+If port 3001 is in use in your environment (common in CI/preview behind a proxy), run on a random free port:
+```
+SERVER_PORT=0 ./gradlew runFast
+```
+or set a specific port:
+```
+SERVER_PORT=3011 ./gradlew runFast
+```
+
 Standard:
 ```
 ./gradlew bootRun
 ```
 
-App: http://localhost:3001  
+App (default): http://localhost:3001  
 Docs: http://localhost:3001/swagger-ui.html  
 H2: http://localhost:3001/h2-console (JDBC URL: jdbc:h2:mem:notesdb)
 
