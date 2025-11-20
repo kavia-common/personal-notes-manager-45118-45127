@@ -25,10 +25,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return build(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage(), null);
     }
 
-    @ExceptionHandler(ErrorResponseException.class)
-    public ResponseEntity<Object> handleSpringError(ErrorResponseException ex) {
-        return build(ex.getStatusCode(), "ERROR", ex.getMessage(), null);
-    }
+    // Note: Do not add a dedicated @ExceptionHandler(ErrorResponseException.class) here.
+    // ResponseEntityExceptionHandler already provides a catch-all mechanism and adding
+    // a specific handler for ErrorResponseException can lead to ambiguity in method resolution
+    // under Spring Boot 3.x. If customized handling is needed later, ensure it does not
+    // overlap with built-in handlers or adjust signatures accordingly.
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleOther(Exception ex) {
