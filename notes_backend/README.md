@@ -38,6 +38,32 @@ App: http://localhost:3001
 Docs: http://localhost:3001/swagger-ui.html  
 H2: http://localhost:3001/h2-console (JDBC URL: jdbc:h2:mem:notesdb)
 
+### Quick health checks
+
+- Health: `curl -i http://localhost:3001/health` should return `200 OK` with body `OK`.
+- Notes list: `curl -i http://localhost:3001/api/notes` should return `200 OK` with a paginated JSON.
+
+### Troubleshooting: Port already in use
+
+If startup fails with:
+```
+APPLICATION FAILED TO START
+Web server failed to start. Port 3001 was already in use.
+```
+Identify and stop the process on 3001:
+```
+lsof -i :3001 -sTCP:LISTEN -n -P
+kill -9 <PID>
+```
+Alternatively, override the port:
+```
+SERVER_PORT=0 ./gradlew bootRun
+```
+or set a specific port:
+```
+SERVER_PORT=3011 ./gradlew bootRun
+```
+
 ## Endpoints
 
 - POST /api/notes
