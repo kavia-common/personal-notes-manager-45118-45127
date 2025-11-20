@@ -28,8 +28,9 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+// Ensure the main class is explicitly configured for Spring Boot tasks
 springBoot {
-	// Explicitly set the main class to avoid bootJar failing to resolve it automatically
+	// Explicitly set the main class to avoid bootJar/bootRun failing to resolve it automatically
 	mainClass = 'com.example.notesbackend.NotesbackendApplication'
 }
 
@@ -53,10 +54,6 @@ tasks.withType(Test).configureEach {
 
 	// Don't fail fast so we can see all failures in CI
 	failFast = false
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
 }
 
 tasks.named('test') {
