@@ -22,8 +22,11 @@ public class HelloController {
     @GetMapping("/docs")
     @Operation(summary = "API Documentation", description = "Redirects to Swagger UI preserving original scheme/host/port")
     public RedirectView docs(HttpServletRequest request) {
+        // Build a full absolute URL using the current request URL as a base.
+        // fromHttpRequest(...) is deprecated; prefer fromHttpUrl with request URL.
+        String requestUrl = request.getRequestURL().toString();
         String target = UriComponentsBuilder
-                .fromHttpRequest(new ServletServerHttpRequest(request))
+                .fromHttpUrl(requestUrl)
                 .replacePath("/swagger-ui.html")
                 .replaceQuery(null)
                 .build()
