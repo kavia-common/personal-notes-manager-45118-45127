@@ -1,63 +1,63 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.8'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.4.8'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.example'
 version = '0.1.0'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.h2database:h2'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'com.h2database:h2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-// Ensure the main class is explicitly configured for Spring Boot tasks
+/**
+ * Configure the main class once, centrally, to avoid ClassNotFound issues.
+ * Aligns with the actual class name: com.example.notesbackend.NotesbackendApplication
+ */
 springBoot {
-	// Explicitly set the main class to avoid bootJar/bootRun failing to resolve it automatically
-	mainClass = 'com.example.notesbackend.NotesbackendApplication'
+    mainClass = 'com.example.notesbackend.NotesbackendApplication'
 }
 
-// Also configure bootRun explicitly (Gradle 8+ idiomatic API)
+/**
+ * Ensure bootRun also uses the same main class explicitly.
+ * This prevents Gradle from attempting classpath scanning to resolve it.
+ */
 tasks.named('bootRun') {
-	mainClass.set('com.example.notesbackend.NotesbackendApplication')
+    mainClass.set('com.example.notesbackend.NotesbackendApplication')
 }
 
 tasks.withType(Test).configureEach {
-	// Ensure JUnit Platform is used and keep logs informative
-	useJUnitPlatform()
-	testLogging {
-		events "passed", "skipped", "failed"
-		exceptionFormat "short"
-		showStandardStreams = false
-	}
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "short"
+        showStandardStreams = false
+    }
 
-	// Avoid long hanging tests in CI: no parallel forks unless configured
-	// and a sensible default timeout for individual tests
-	systemProperty "junit.jupiter.execution.timeout.default", "10s"
-
-	// Don't fail fast so we can see all failures in CI
-	failFast = false
+    systemProperty "junit.jupiter.execution.timeout.default", "10s"
+    failFast = false
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 /*
@@ -66,16 +66,16 @@ tasks.named('test') {
  tasks are requested externally.
 */
 tasks.register("checkstyleMain") {
-	group = "verification"
-	description = "No-op placeholder (Checkstyle not configured)"
-	doLast {
-		logger.lifecycle("checkstyleMain: no-op (Checkstyle plugin not applied)")
-	}
+    group = "verification"
+    description = "No-op placeholder (Checkstyle not configured)"
+    doLast {
+        logger.lifecycle("checkstyleMain: no-op (Checkstyle plugin not applied)")
+    }
 }
 tasks.register("checkstyleTest") {
-	group = "verification"
-	description = "No-op placeholder (Checkstyle not configured)"
-	doLast {
-		logger.lifecycle("checkstyleTest: no-op (Checkstyle plugin not applied)")
-	}
+    group = "verification"
+    description = "No-op placeholder (Checkstyle not configured)"
+    doLast {
+        logger.lifecycle("checkstyleTest: no-op (Checkstyle plugin not applied)")
+    }
 }

@@ -4,14 +4,25 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Application entry point for the Notes Backend.
- * Starts a Spring Boot app exposing REST endpoints on port configured in application.properties (3001).
+ * PUBLIC_INTERFACE
+ * NotesbackendApplication is the Spring Boot entry point for the Notes Backend.
+ *
+ * Package: com.example.notesbackend
+ * Visibility: public
+ * Annotation: @SpringBootApplication
+ *
+ * This application serves REST endpoints and is configured to run on port 3001
+ * via src/main/resources/application.properties.
  */
-// PUBLIC_INTERFACE
 @SpringBootApplication
 public class NotesbackendApplication {
-	/** Boot application. */
-	public static void main(String[] args) {
-		SpringApplication.run(NotesbackendApplication.class, args);
-	}
+
+    /**
+     * PUBLIC_INTERFACE
+     * Boot the Spring application.
+     * @param args command line arguments
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(NotesbackendApplication.class, args);
+    }
 }
