@@ -28,6 +28,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    // Keep devtools as developmentOnly; will be explicitly disabled for bootRun to avoid LiveReload blocks.
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -44,12 +45,32 @@ springBoot {
 
 /**
  * Ensure bootRun and bootJar also use the same main class explicitly.
+ * Also ensure bootRun is fast and non-interactive for preview environments:
+ *  - Disable devtools (no LiveReload, no file watch)
+ *  - Do not trigger tests when using run tasks
  */
 tasks.named('bootRun') {
     mainClass.set('com.example.notesbackend.NotesbackendApplication')
+
+    // Disable devtools to prevent LiveReload/websocket waiting or interactive input
+    systemProperty "spring.devtools.add-properties", "false"
+    systemProperty "spring.devtools.restart.enabled", "false"
+    systemProperty "spring.devtools.livereload.enabled", "false"
+
+    // Ensure server binds to configured port, but allow override via SERVER_PORT env
+    // Nothing to do here explicitly; application.properties already supports SERVER_PORT.
+
+    // Ensure a quick startup by reducing Hibernate/SQL logging noise (kept in properties)
 }
+
+// Keep main class on bootJar as well.
 tasks.named('bootJar') {
     mainClass.set('com.example.notesbackend.NotesbackendApplication')
+}
+
+// Ensure the lifecycle task 'build' does not implicitly run bootRun.
+tasks.named('build') {
+    // nothing special; default build = assemble + check (tests). Run tasks separated via custom tasks below.
 }
 
 tasks.withType(Test).configureEach {
@@ -73,6 +94,8 @@ tasks.register('quickTest', Test) {
     // Run only fast tests by package/class patterns
     include '**/ContextLoadTest.class'
     include '**/service/*Test.class'
+    // Exclude web-layer tests to avoid starting full web context in quick pass
+    exclude '**/web/*'
     testLogging {
         events "failed"
         exceptionFormat "short"
@@ -88,6 +111,29 @@ tasks.named('test') {
     if (project.hasProperty('quickUnit')) {
         // Skip slower web-layer tests in quick mode
         exclude '**/web/*'
+    }
+}
+
+/**
+ * CI/preview convenience tasks:
+ * - assembleOnly: build artifacts without running tests
+ * - runFast: run app quickly (no tests, devtools disabled)
+ */
+tasks.register('assembleOnly') {
+    group = "build"
+    description = "Assemble jars without running tests"
+    dependsOn 'clean', 'assemble'
+}
+
+tasks.register('runFast') {
+    group = "application"
+    description = "Runs the Spring Boot app quickly with devtools disabled and without running tests"
+    // Ensure classes/resources are compiled
+    dependsOn 'classes'
+    // Explicitly run bootRun and ensure it does not depend on 'test'
+    finalizedBy 'bootRun'
+    doFirst {
+        logger.lifecycle("Starting application with devtools disabled; tests are not executed as part of runFast.")
     }
 }
 

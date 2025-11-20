@@ -18,18 +18,28 @@ Standard build:
 ./gradlew clean build
 ```
 
-If CI needs a faster preview without integration-like tests, use:
+Fast assemble (no tests) for preview environments:
+```
+./gradlew assembleOnly
+```
+
+If CI needs a faster unit test sweep without web-layer tests:
 ```
 ./gradlew clean test -PquickUnit
 ```
-
-Where `-PquickUnit` is interpreted by CI to only select fast tests. Currently all tests are fairly light, but if build timeouts occur, consider limiting to specific packages or tags via:
+or select specific tests:
 ```
 ./gradlew test --tests '*NoteServiceTest'
 ```
 
 ## Run
 
+Recommended for preview (no tests and no devtools/live-reload blocking):
+```
+./gradlew runFast
+```
+
+Standard:
 ```
 ./gradlew bootRun
 ```
