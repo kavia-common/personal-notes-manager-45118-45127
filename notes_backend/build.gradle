@@ -26,6 +26,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Ensure Bean Validation is present to avoid NoProviderFoundException at runtime
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     // Keep devtools as developmentOnly; will be explicitly disabled for bootRun to avoid LiveReload blocks.
@@ -57,10 +58,10 @@ tasks.named('bootRun') {
     systemProperty "spring.devtools.restart.enabled", "false"
     systemProperty "spring.devtools.livereload.enabled", "false"
 
-    // Ensure server binds to configured port, but allow override via SERVER_PORT env
-    // Nothing to do here explicitly; application.properties already supports SERVER_PORT.
+    // Avoid running tests implicitly; ensure bootRun has no dependency on test
+    dependsOn.removeIf { it == tasks.findByName('test') }
 
-    // Ensure a quick startup by reducing Hibernate/SQL logging noise (kept in properties)
+    // Ensure quick startup; additional logging controls are in application.properties
 }
 
 // Keep main class on bootJar as well.
@@ -125,13 +126,27 @@ tasks.register('assembleOnly') {
     dependsOn 'clean', 'assemble'
 }
 
+tasks.register('noTestsBootRun', org.springframework.boot.gradle.tasks.run.BootRun) {
+    group = "application"
+    description = "Run Spring Boot application without executing tests and with devtools disabled"
+    mainClass.set('com.example.notesbackend.NotesbackendApplication')
+    // Disable devtools
+    systemProperty "spring.devtools.add-properties", "false"
+    systemProperty "spring.devtools.restart.enabled", "false"
+    systemProperty "spring.devtools.livereload.enabled", "false"
+    // Ensure compile only
+    dependsOn 'classes'
+    // Do NOT depend on tests
+    mustRunAfter 'test'
+}
+
 tasks.register('runFast') {
     group = "application"
     description = "Runs the Spring Boot app quickly with devtools disabled and without running tests"
-    // Ensure classes/resources are compiled
+    // Ensure classes/resources are compiled only
     dependsOn 'classes'
-    // Explicitly run bootRun and ensure it does not depend on 'test'
-    finalizedBy 'bootRun'
+    // Run our noTestsBootRun variant to avoid any accidental test triggers
+    finalizedBy 'noTestsBootRun'
     doFirst {
         logger.lifecycle("Starting application with devtools disabled; tests are not executed as part of runFast.")
     }

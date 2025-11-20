@@ -39,6 +39,14 @@ Recommended for preview (no tests and no devtools/live-reload blocking):
 ./gradlew runFast
 ```
 
+Notes:
+- runFast compiles classes only and then runs the app (no tests). It disables devtools restart/livereload to prevent preview blocking.
+- You can also run:
+```
+./gradlew noTestsBootRun
+```
+which directly executes a bootRun variant with tests/devtools disabled.
+
 If port 3001 is in use in your environment (common in CI/preview behind a proxy), run on a random free port:
 ```
 SERVER_PORT=0 ./gradlew runFast
@@ -52,6 +60,7 @@ Standard:
 ```
 ./gradlew bootRun
 ```
+(bootRun is configured to disable devtools and not depend on tests.)
 
 App (default): http://localhost:3001  
 Docs: http://localhost:3001/swagger-ui.html  
@@ -59,7 +68,7 @@ H2: http://localhost:3001/h2-console (JDBC URL: jdbc:h2:mem:notesdb)
 
 ### Quick health checks
 
-- Health: `curl -i http://localhost:3001/health` should return `200 OK` with body `OK`.
+- Health: `curl -i http://localhost:3001/health` should return `200 OK` with body `OK`. This endpoint is lightweight and responds immediately after the app starts.
 - Notes list: `curl -i http://localhost:3001/api/notes` should return `200 OK` with a paginated JSON.
 
 ### Troubleshooting: Port already in use
